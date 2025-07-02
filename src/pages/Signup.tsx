@@ -7,12 +7,26 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onSwitchToLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = () => {
-    if (name && email && password) {
-      onSignup(name, email, password);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+  }>({});
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const newErrors: { name?: string; email?: string; password?: string } = {};
+    if (!name.trim()) newErrors.name = "Name is required";
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password.trim()) newErrors.password = "Password is required";
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      // Proceed with login (call API, etc.)
+      onLogin(name, email, password);
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
@@ -32,7 +46,8 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onSwitchToLogin }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-            />
+            />{" "}
+            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
           </div>
 
           <div>
@@ -43,6 +58,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onSwitchToLogin }) => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
             />
+            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
           </div>
 
           <div>
@@ -54,6 +70,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onSwitchToLogin }) => {
               onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
             />
+            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
           </div>
 
           <button
